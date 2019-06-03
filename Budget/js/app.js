@@ -107,12 +107,46 @@ class UI {
   totalExpense() {
     let total = 0;
     if (this.itemList.length > 0) {
-      total = this.itemList.reduce(function(acc, curr){
-      },0)
-      console.log(total);
+      total = this.itemList.reduce(function(acc, curr) {
+        console.log(`total is ${acc} and the current value is ${curr.amount}`);
+        acc += curr.amount;
+        return acc;
+      }, 0);
     }
-    this.expenseAmount.textContent = total
+    this.expenseAmount.textContent = total;
     return total;
+  }
+
+  editExpense(element){
+    let id  = parseInt(element.dataset.id)
+    let parent = element.parentElement.parentElement.parentElement
+    // remove from dom
+    this.expenseList.removeChild(parent)
+    // remove from the list
+    let expense = this.itemList.filter(function(item){
+      return item.id === id
+    })
+    // show value
+    this.expenseInput.value = expense[0].title
+    this.amountInput.value = expense[0].amount
+    // remove from list
+    let tempList = this.itemList.filter(function(item){
+      return item.id !== id
+    })
+    this.itemList = tempList
+    this.showBalance()
+  }
+  deleteExpense(element){
+    let id  = parseInt(element.dataset.id)
+    let parent = element.parentElement.parentElement.parentElement
+    // remove from dom
+    this.expenseList.removeChild(parent)
+    // remove from list
+    let tempList = this.itemList.filter(function(item){
+      return item.id !== id
+    })
+    this.itemList = tempList
+    this.showBalance()
   }
 }
 
@@ -138,7 +172,13 @@ function eventListener() {
   });
 
   // expense click
-  expenseList.addEventListener("click", function() {});
+  expenseList.addEventListener("click", function(event) {
+    if (event.target.parentElement.classList.contains("edit-icon")) {
+      ui.editExpense(event.target.parentElement)
+    } else if (event.target.parentElement.classList.contains("delete-icon")) {
+      ui.deleteExpense(event.target.parentElement)
+    }
+  });
 }
 document.addEventListener("DOMContentLoaded", function() {
   eventListener();
